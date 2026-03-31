@@ -31,16 +31,23 @@ import reactor.core.publisher.Mono;
 /**
  * Factory class for creating Model Context Protocol (MCP) servers. MCP servers expose
  * tools, resources, and prompts to AI models through a standardized interface.
+ * 用于创建模型上下文协议 (MCP) 服务器的工厂类。MCP 服务器通过标准化接口向 AI 模型公开工具、资源和提示。
  *
  * <p>
  * This class serves as the main entry point for implementing the server-side of the MCP
  * specification. The server's responsibilities include:
+ * 此类是实现 MCP 规范服务器端的主要入口点。服务器的职责包括：
  * <ul>
  * <li>Exposing tools that models can invoke to perform actions
+ *     公开模型可以调用以执行操作的工具
  * <li>Providing access to resources that give models context
+ *     提供能够赋予模型背景的资源
  * <li>Managing prompt templates for structured model interactions
+ *     管理结构化模型交互的提示模板
  * <li>Handling client connections and requests
+ *     处理客户端连接和请求
  * <li>Implementing capability negotiation
+ *     实施能力谈判
  * </ul>
  *
  * <p>
@@ -48,21 +55,29 @@ import reactor.core.publisher.Mono;
  * thread-safe. The synchronous server processes requests sequentially, while the
  * asynchronous server can handle concurrent requests safely through its reactive
  * programming model.
+ * 线程安全：同步服务器和异步服务器都是线程安全的。
+ * 同步服务器按顺序处理请求，而异步服务器可以通过其响应式编程模型安全地处理并发请求。
  *
  * <p>
  * Error Handling: The server implementations provide robust error handling through the
  * McpError class. Errors are properly propagated to clients while maintaining the
  * server's stability. Server implementations should use appropriate error codes and
  * provide meaningful error messages to help diagnose issues.
+ * 错误处理：服务器实现通过 McpError 类提供强大的错误处理机制。
+ * 错误会正确地传播给客户端，同时保持服务器的稳定性。服务器实现应使用适当的错误代码并提供有意义的错误信息，以帮助诊断问题。
  *
  * <p>
  * The class provides factory methods to create either:
+ * 该类提供工厂方法来创建以下两种类型之一：
  * <ul>
  * <li>{@link McpAsyncServer} for non-blocking operations with reactive responses
+ *     {@link McpAsyncServer} 用于具有响应式响应的非阻塞操作
  * <li>{@link McpSyncServer} for blocking operations with direct responses
+ *     {@link McpSyncServer} 用于具有直接响应的阻塞操作
  * </ul>
  *
  * <p>
+ * 创建基本同步服务器的示例：
  * Example of creating a basic synchronous server: <pre>{@code
  * McpServer.sync(transportProvider)
  *     .serverInfo("my-server", "1.0.0")
@@ -73,7 +88,8 @@ import reactor.core.publisher.Mono;
  *                   .build())
  *     .build();
  * }</pre>
- *
+ * 
+ * 创建基本异步服务器的示例：
  * Example of creating a basic asynchronous server: <pre>{@code
  * McpServer.async(transportProvider)
  *     .serverInfo("my-server", "1.0.0")
@@ -87,6 +103,7 @@ import reactor.core.publisher.Mono;
  * }</pre>
  *
  * <p>
+ * 包含完整异步配置的示例：
  * Example with comprehensive asynchronous configuration: <pre>{@code
  * McpServer.async(transportProvider)
  *     .serverInfo("advanced-server", "2.0.0")
@@ -152,6 +169,9 @@ public interface McpServer {
 	 * Synchronous servers block the current Thread's execution upon each request before
 	 * giving the control back to the caller, making them simpler to implement but
 	 * potentially less scalable for concurrent operations.
+	 * 开始构建一个提供阻塞操作的同步 MCP 服务器。
+	 * 同步服务器在每次请求时都会阻塞当前线程的执行，然后再将控制权交还给调用者，
+	 * 这使得它们更容易实现，但对于并发操作而言，其可扩展性可能较差。
 	 * @param transportProvider The transport layer implementation for MCP communication.
 	 * @return A new instance of {@link SyncSpecification} for configuring the server.
 	 */
