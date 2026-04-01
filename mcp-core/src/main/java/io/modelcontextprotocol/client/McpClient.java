@@ -33,23 +33,31 @@ import java.util.function.Supplier;
  * Factory class for creating Model Context Protocol (MCP) clients. MCP is a protocol that
  * enables AI models to interact with external tools and resources through a standardized
  * interface.
+ * 这个类用于创建MCP客户端。MCP是一种协议，用于使AI模型与外部工具和资源进行交互。
  *
  * <p>
  * This class serves as the main entry point for establishing connections with MCP
  * servers, implementing the client-side of the MCP specification. The protocol follows a
  * client-server architecture where:
+ * 此类是与 MCP 服务器建立连接的主要入口点，实现了 MCP 规范的客户端部分。该协议遵循客户端-服务器架构，其中：
  * <ul>
  * <li>The client (this implementation) initiates connections and sends requests
+ *     客户端（此实现）发起连接并发送请求
  * <li>The server responds to requests and provides access to tools and resources
+ *     服务器响应请求并提供对工具和资源的访问权限
  * <li>Communication occurs through a transport layer (e.g., stdio, SSE) using JSON-RPC
+ *     通信通过传输层（例如，stdio、SSE）使用 JSON-RPC 进行。
  * 2.0
  * </ul>
  *
  * <p>
  * The class provides factory methods to create either:
+ * 该类提供工厂方法来创建以下两种类型之一：
  * <ul>
  * <li>{@link McpAsyncClient} for non-blocking operations with CompletableFuture responses
+ *     {@link McpAsyncClient} 用于处理带有 CompletableFuture 响应的非阻塞操作
  * <li>{@link McpSyncClient} for blocking operations with direct responses
+ *     {@link McpSyncClient} 用于具有直接响应的阻塞操作
  * </ul>
  *
  * <p>
@@ -66,7 +74,9 @@ import java.util.function.Supplier;
  * }</pre>
  *
  * <p>
- * Example with advanced asynchronous configuration: <pre>{@code
+ * Example with advanced asynchronous configuration:
+ * 高级异步配置示例：
+ * <pre>{@code
  * McpClient.async(transport)
  *     .requestTimeout(Duration.ofSeconds(10))
  *     .capabilities(new ClientCapabilities(...))
@@ -82,22 +92,34 @@ import java.util.function.Supplier;
  *
  * <p>
  * The client supports:
+ * 这个客户端支持：
  * <ul>
  * <li>Tool discovery and invocation
+ *     工具发现和调用
  * <li>Resource access and management
+ *     资源获取与管理
  * <li>Prompt template handling
+ *     提示模板处理
  * <li>Real-time updates through change consumers
+ *     通过变化消费者实现实时更新
  * <li>Custom sampling strategies
+ *     自定义采样策略
  * <li>Structured logging with severity levels
+ *     具有严重级别的结构化日志记录
  * </ul>
  *
  * <p>
  * The client supports structured logging through the MCP logging utility:
+ * 该客户端支持结构化日志记录通过 MCP 日志实用工具：
  * <ul>
  * <li>Eight severity levels from DEBUG to EMERGENCY
+ *     从调试到紧急，共八个严重级别
  * <li>Optional logger name categorization
+ *     可选的日志记录器名称分类
  * <li>Configurable logging consumers
+ *     可配置的日志记录使用者
  * <li>Server-controlled minimum log level
+ *     服务器控制的最低日志级别
  * </ul>
  *
  * @author Christian Tzolov

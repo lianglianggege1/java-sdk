@@ -24,55 +24,78 @@ import reactor.util.context.ContextView;
 
 /**
  * <b>Handles the protocol initialization phase between client and server</b>
+ *    处理客户端和服务器之间的协议初始化阶段
  *
  * <p>
  * The initialization phase MUST be the first interaction between client and server.
  * During this phase, the client and server perform the following operations:
+ * 初始化阶段必须是客户端和服务器之间的首次交互。在此阶段，客户端和服务器执行以下操作：
  * <ul>
  * <li>Establish protocol version compatibility</li>
+ *     建立协议版本兼容性
  * <li>Exchange and negotiate capabilities</li>
+ *     交流和协商能力
  * <li>Share implementation details</li>
+ *     分享实施细节
  * </ul>
  *
  * <b>Client Initialization Process</b>
+ *    客户端初始化过程
  * <p>
  * The client MUST initiate this phase by sending an initialize request containing:
+ * 客户端必须通过发送包含以下内容的初始化请求来启动此阶段：
  * <ul>
  * <li>Protocol version supported</li>
+ *     支持的协议版本
  * <li>Client capabilities</li>
+ *     客户能力
  * <li>Client implementation information</li>
+ *     客户实施信息
  * </ul>
  *
  * <p>
  * After successful initialization, the client MUST send an initialized notification to
  * indicate it is ready to begin normal operations.
+ * 初始化成功后，客户端必须发送初始化通知，表明它已准备好开始正常操作。
  *
  * <b>Server Response</b>
+ *    服务器响应
  * <p>
  * The server MUST respond with its own capabilities and information.
+ * 服务器必须提供自身的功能和信息进行响应。
  *
  * <b>Protocol Version Negotiation</b>
+ *    协议版本协商
  * <p>
  * In the initialize request, the client MUST send a protocol version it supports. This
  * SHOULD be the latest version supported by the client.
+ * 在初始化请求中，客户端必须发送其支持的协议版本。这应该是客户端支持的最新版本。
  *
  * <p>
  * If the server supports the requested protocol version, it MUST respond with the same
  * version. Otherwise, the server MUST respond with another protocol version it supports.
  * This SHOULD be the latest version supported by the server.
+ * 如果服务器支持请求的协议版本，则必须返回相同的版本。
+ * 否则，服务器必须返回其支持的另一个协议版本。
+ * 该版本应该是服务器支持的最新版本。
  *
  * <p>
  * If the client does not support the version in the server's response, it SHOULD
  * disconnect.
+ * 如果客户端不支持服务器响应中的版本，则应断开连接。请求限制
  *
  * <b>Request Restrictions</b>
+ *    请求限制
  * <p>
  * <strong>Important:</strong> The following restrictions apply during initialization:
+ * 初始化期间需遵守以下限制：
  * <ul>
  * <li>The client SHOULD NOT send requests other than pings before the server has
  * responded to the initialize request</li>
+ * 在服务器响应初始化请求之前，客户端不应发送除 ping 请求之外的任何请求。
  * <li>The server SHOULD NOT send requests other than pings and logging before receiving
  * the initialized notification</li>
+ * 服务器在收到初始化通知之前，不应发送除 ping 和日志记录之外的任何请求。
  * </ul>
  */
 class LifecycleInitializer {
@@ -135,6 +158,7 @@ class LifecycleInitializer {
 
 	/**
 	 * Represents the initialization state of the MCP client.
+	 * 表示 MCP 客户端的初始化状态。
 	 */
 	interface Initialization {
 
@@ -142,6 +166,8 @@ class LifecycleInitializer {
 		 * Returns the MCP client session that is used to communicate with the server.
 		 * This session is established during the initialization process and is used for
 		 * sending requests and notifications.
+		 * 返回用于与服务器通信的 MCP 客户端会话。
+		 * 此会话在初始化过程中建立，用于发送请求和通知。
 		 * @return The MCP client session
 		 */
 		McpClientSession mcpSession();
@@ -150,6 +176,8 @@ class LifecycleInitializer {
 		 * Returns the result of the MCP initialization process. This result contains
 		 * information about the protocol version, capabilities, server info, and
 		 * instructions provided by the server during the initialization phase.
+		 * 返回 MCP 初始化过程的结果。
+		 * 该结果包含有关协议版本、功能、服务器信息以及服务器在初始化阶段提供的指令的信息。
 		 * @return The result of the MCP initialization process
 		 */
 		McpSchema.InitializeResult initializeResult();
@@ -161,12 +189,16 @@ class LifecycleInitializer {
 		/**
 		 * A sink that emits the result of the MCP initialization process. It allows
 		 * subscribers to wait for the initialization to complete.
+		 * 一个用于输出 MCP 初始化过程结果的接收器。
+		 * 它允许订阅者等待初始化完成。
 		 */
 		private final Sinks.One<McpSchema.InitializeResult> initSink;
 
 		/**
 		 * Holds the result of the MCP initialization process. It is used to cache the
 		 * result for future requests.
+		 * 保存 MCP 初始化过程的结果。
+		 * 它用于缓存结果以供后续请求使用。
 		 */
 		private final AtomicReference<McpSchema.InitializeResult> result;
 
@@ -174,6 +206,8 @@ class LifecycleInitializer {
 		 * Holds the MCP client session that is used to communicate with the server. It is
 		 * set during the initialization process and used for sending requests and
 		 * notifications.
+		 * 用于保存与服务器通信的 MCP 客户端会话。
+		 * 它在初始化过程中设置，用于发送请求和通知。
 		 */
 		private final AtomicReference<McpClientSession> mcpClientSession;
 
@@ -186,6 +220,7 @@ class LifecycleInitializer {
 		// ---------------------------------------------------
 		// Public access for mcpSession and initializeResult because they are
 		// used in by the McpAsyncClient.
+		// 因为 mcpSession 和 initializeResult 被 McPAsyncClient 使用，所以需要公开访问权限。
 		// ----------------------------------------------------
 		public McpClientSession mcpSession() {
 			return this.mcpClientSession.get();
@@ -265,9 +300,12 @@ class LifecycleInitializer {
 	/**
 	 * Utility method to ensure the initialization is established before executing an
 	 * operation.
-	 * @param <T> The type of the result Mono
+	 * 用于确保在执行操作之前完成初始化的实用方法。
+	 * @param <T> The type of the result Mono 结果类型为 Mono
 	 * @param actionName The action to perform when the client is initialized
+	 *                   客户端初始化时要执行的操作
 	 * @param operation The operation to execute when the client is initialized
+	 *                   客户端初始化时要执行的操作
 	 * @return A Mono that completes with the result of the operation
 	 */
 	public <T> Mono<T> withInitialization(String actionName, Function<Initialization, Mono<T>> operation) {

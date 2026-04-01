@@ -23,14 +23,21 @@ import java.util.function.Function;
  * Default implementation of the MCP (Model Context Protocol) session that manages
  * bidirectional JSON-RPC communication between clients and servers. This implementation
  * follows the MCP specification for message exchange and transport handling.
+ * 这是 MCP（模型上下文协议）会话的默认实现，用于管理客户端和服务器之间的双向 JSON-RPC 通信。
+ * 此实现遵循 MCP 规范进行消息交换和传输处理。
  *
  * <p>
  * The session manages:
+ * 会话管理：
  * <ul>
  * <li>Request/response handling with unique message IDs</li>
+ *     使用唯一消息 ID 处理请求/响应
  * <li>Notification processing</li>
+ *     通知处理
  * <li>Message timeout management</li>
+ *     消息超时管理
  * <li>Transport layer abstraction</li>
+ *     传输层抽象
  * </ul>
  *
  * @author Christian Tzolov
@@ -42,29 +49,38 @@ public class McpClientSession implements McpSession {
 	private static final Logger logger = LoggerFactory.getLogger(McpClientSession.class);
 
 	/** Duration to wait for request responses before timing out */
+	// 等待请求响应的超时时间
 	private final Duration requestTimeout;
 
 	/** Transport layer implementation for message exchange */
+	// 协议层实现信息交互
 	private final McpClientTransport transport;
 
 	/** Map of pending responses keyed by request ID */
+	// 按请求 ID 键显示的待处理响应地图
 	private final ConcurrentHashMap<Object, MonoSink<McpSchema.JSONRPCResponse>> pendingResponses = new ConcurrentHashMap<>();
 
 	/** Map of request handlers keyed by method name */
+	// 按方法名称键的请求处理程序映射
 	private final ConcurrentHashMap<String, RequestHandler<?>> requestHandlers = new ConcurrentHashMap<>();
 
 	/** Map of notification handlers keyed by method name */
+	// 按方法名称键的通知处理程序映射
 	private final ConcurrentHashMap<String, NotificationHandler> notificationHandlers = new ConcurrentHashMap<>();
 
 	/** Session-specific prefix for request IDs */
+	// 请求 ID 的会话特定前缀
 	private final String sessionPrefix = UUID.randomUUID().toString().substring(0, 8);
 
 	/** Atomic counter for generating unique request IDs */
+	// 用于生成唯一请求 ID 的原子计数器
 	private final AtomicLong requestCounter = new AtomicLong(0);
 
 	/**
 	 * Functional interface for handling incoming JSON-RPC requests. Implementations
 	 * should process the request parameters and return a response.
+	 * 用于处理传入的 JSON-RPC 请求的功能接口。
+	 * 实现应处理请求参数并返回响应。
 	 *
 	 * @param <T> Response type
 	 */
@@ -73,6 +89,7 @@ public class McpClientSession implements McpSession {
 
 		/**
 		 * Handles an incoming request with the given parameters.
+		 * 处理带有给定参数的传入请求。
 		 * @param params The request parameters
 		 * @return A Mono containing the response object
 		 */
@@ -83,12 +100,14 @@ public class McpClientSession implements McpSession {
 	/**
 	 * Functional interface for handling incoming JSON-RPC notifications. Implementations
 	 * should process the notification parameters without returning a response.
+	 * 用于处理传入的 JSON-RPC 通知的功能接口。实现应处理通知参数，但不返回响应。
 	 */
 	@FunctionalInterface
 	public interface NotificationHandler {
 
 		/**
 		 * Handles an incoming notification with the given parameters.
+		 * 处理带有给定参数的传入通知。
 		 * @param params The notification parameters
 		 * @return A Mono that completes when the notification is processed
 		 */
@@ -98,6 +117,7 @@ public class McpClientSession implements McpSession {
 
 	/**
 	 * Creates a new McpClientSession with the specified configuration and handlers.
+	 * 使用指定的配置和处理程序创建新的 McpClientSession。
 	 * @param requestTimeout Duration to wait for responses
 	 * @param transport Transport implementation for message exchange
 	 * @param requestHandlers Map of method names to request handlers
@@ -213,6 +233,7 @@ public class McpClientSession implements McpSession {
 
 	/**
 	 * Handles an incoming JSON-RPC notification by routing it to the appropriate handler.
+	 * 处理传入的 JSON-RPC 通知，并将其路由到相应的处理程序。
 	 * @param notification The incoming JSON-RPC notification
 	 * @return A Mono that completes when the notification is processed
 	 */
@@ -230,6 +251,7 @@ public class McpClientSession implements McpSession {
 	/**
 	 * Generates a unique request ID in a non-blocking way. Combines a session-specific
 	 * prefix with an atomic counter to ensure uniqueness.
+	 * 以非阻塞方式生成唯一的请求 ID。结合会话特定的前缀和原子计数器，确保唯一性。
 	 * @return A unique request ID string
 	 */
 	private String generateRequestId() {
@@ -238,6 +260,7 @@ public class McpClientSession implements McpSession {
 
 	/**
 	 * Sends a JSON-RPC request and returns the response.
+	 * 发送 JSON-RPC 请求并返回响应。
 	 * @param <T> The expected response type
 	 * @param method The method name to call
 	 * @param requestParams The request parameters

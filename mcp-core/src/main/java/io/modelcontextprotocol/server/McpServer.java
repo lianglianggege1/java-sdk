@@ -184,6 +184,9 @@ public interface McpServer {
 	 * Asynchronous servers can handle multiple requests concurrently on a single Thread
 	 * using a functional paradigm with non-blocking server transports, making them more
 	 * scalable for high-concurrency scenarios but more complex to implement.
+	 * 开始构建一个提供非阻塞操作的异步 MCP 服务器。
+	 * 异步服务器可以使用函数式编程范式和非阻塞服务器传输，
+	 * 在单个线程上并发处理多个请求，这使得它们在高并发场景下更具可扩展性，但实现起来也更复杂。
 	 * @param transportProvider The transport layer implementation for MCP communication.
 	 * @return A new instance of {@link AsyncSpecification} for configuring the server.
 	 */
@@ -196,6 +199,9 @@ public interface McpServer {
 	 * Synchronous servers block the current Thread's execution upon each request before
 	 * giving the control back to the caller, making them simpler to implement but
 	 * potentially less scalable for concurrent operations.
+	 * 开始构建一个提供阻塞操作的同步 MCP 服务器。
+	 * 同步服务器在每次请求时都会阻塞当前线程的执行，然后再将控制权交还给调用者，
+	 * 这使得它们更容易实现，但对于并发操作而言，其可扩展性可能较差。
 	 * @param transportProvider The transport layer implementation for MCP communication.
 	 * @return A new instance of {@link SyncSpecification} for configuring the server.
 	 */
@@ -209,6 +215,9 @@ public interface McpServer {
 	 * using a functional paradigm with non-blocking server transports, making them more
 	 * scalable for high-concurrency scenarios but more complex to implement.
 	 * @param transportProvider The transport layer implementation for MCP communication.
+	 * 开始构建一个提供非阻塞操作的异步 MCP 服务器。
+	 * 异步服务器可以使用函数式编程范式和非阻塞服务器传输，
+	 * 在单个线程上并发处理多个请求，这使得它们在高并发场景下更具可扩展性，但实现起来也更复杂。
 	 * @return A new instance of {@link AsyncSpecification} for configuring the server.
 	 */
 	static AsyncSpecification<?> async(McpStreamableServerTransportProvider transportProvider) {
@@ -232,6 +241,9 @@ public interface McpServer {
 	 * Synchronous servers block the current Thread's execution upon each request before
 	 * giving the control back to the caller, making them simpler to implement but
 	 * potentially less scalable for concurrent operations.
+	 * 开始构建一个提供非阻塞操作的异步 MCP 服务器。
+	 * 异步服务器可以使用函数式编程范式和非阻塞服务器传输，
+	 * 在单个线程上并发处理多个请求，这使得它们在高并发场景下更具可扩展性，但实现起来也更复杂。
 	 * @param transport The transport layer implementation for MCP communication.
 	 * @return A new instance of {@link SyncSpecification} for configuring the server.
 	 */
@@ -250,6 +262,7 @@ public interface McpServer {
 
 		/**
 		 * Builds an asynchronous MCP server that provides non-blocking operations.
+		 * 构建一个异步 MCP 服务器，提供非阻塞操作。
 		 * @return A new instance of {@link McpAsyncServer} configured with this builder's
 		 * settings.
 		 */
@@ -278,6 +291,7 @@ public interface McpServer {
 
 		/**
 		 * Builds an asynchronous MCP server that provides non-blocking operations.
+		 * 构建一个异步 MCP 服务器，提供非阻塞操作。
 		 * @return A new instance of {@link McpAsyncServer} configured with this builder's
 		 * settings.
 		 */
@@ -296,6 +310,7 @@ public interface McpServer {
 
 	/**
 	 * Asynchronous server specification.
+	 * 异步服务器规范。
 	 */
 	abstract class AsyncSpecification<S extends AsyncSpecification<S>> {
 
@@ -319,6 +334,9 @@ public interface McpServer {
 		 * systems, such as querying databases, calling APIs, or performing computations.
 		 * Each tool is uniquely identified by a name and includes metadata describing its
 		 * schema.
+		 * 模型上下文协议 (MCP) 允许服务器公开可供语言模型调用的工具。
+		 * 这些工具使模型能够与外部系统交互，例如查询数据库、调用 API 或执行计算。
+		 * 每个工具都由一个唯一的名称标识，并包含描述其模式的元数据。
 		 */
 		final List<McpServerFeatures.AsyncToolSpecification> tools = new ArrayList<>();
 
@@ -328,6 +346,9 @@ public interface McpServer {
 		 * provides context to language models, such as files, database schemas, or
 		 * application-specific information. Each resource is uniquely identified by a
 		 * URI.
+		 * 模型上下文协议 (MCP) 为服务器向客户端公开资源提供了一种标准化的方式。
+		 * 资源允许服务器共享为语言模型提供上下文的数据，例如文件、数据库模式或应用程序特定信息。
+		 * 每个资源都由一个唯一的 URI 标识。
 		 */
 		final Map<String, McpServerFeatures.AsyncResourceSpecification> resources = new HashMap<>();
 
@@ -337,6 +358,10 @@ public interface McpServer {
 		 * define parameterized URIs that clients can use to access dynamic resources.
 		 * Each resource template includes variables that clients can fill in to form
 		 * concrete resource URIs.
+		 * 模型上下文协议 (MCP) 为服务器提供了一种标准化的方式，
+		 * 使其能够向客户端公开资源模板。
+		 * 资源模板允许服务器定义参数化的 URI，客户端可以使用这些 URI 访问动态资源。
+		 * 每个资源模板都包含一些变量，客户端可以填写这些变量来生成具体的资源 URI。
 		 */
 		final Map<String, McpServerFeatures.AsyncResourceTemplateSpecification> resourceTemplates = new HashMap<>();
 
@@ -346,6 +371,9 @@ public interface McpServer {
 		 * messages and instructions for interacting with language models. Clients can
 		 * discover available prompts, retrieve their contents, and provide arguments to
 		 * customize them.
+		 * 模型上下文协议 (MCP) 为服务器提供了一种标准化的方式，使其能够向客户端公开提示模板。
+		 * 提示允许服务器提供结构化的消息和指令，以便与语言模型进行交互。
+		 * 客户端可以发现可用的提示，检索其内容，并提供参数来自定义这些提示。
 		 */
 		final Map<String, McpServerFeatures.AsyncPromptSpecification> prompts = new HashMap<>();
 
@@ -360,6 +388,7 @@ public interface McpServer {
 		/**
 		 * Sets the URI template manager factory to use for creating URI templates. This
 		 * allows for custom URI template parsing and variable extraction.
+		 * 设置用于创建 URI 模板的 URI 模板管理器工厂。这允许自定义 URI 模板解析和变量提取。
 		 * @param uriTemplateManagerFactory The factory to use. Must not be null.
 		 * @return This builder instance for method chaining
 		 * @throws IllegalArgumentException if uriTemplateManagerFactory is null
@@ -374,6 +403,8 @@ public interface McpServer {
 		 * Sets the duration to wait for server responses before timing out requests. This
 		 * timeout applies to all requests made through the client, including tool calls,
 		 * resource access, and prompt operations.
+		 * 设置等待服务器响应的最长时间，超过此时间请求将超时。
+		 * 此超时时间适用于客户端发出的所有请求，包括工具调用、资源访问和提示操作。
 		 * @param requestTimeout The duration to wait before timing out requests. Must not
 		 * be null.
 		 * @return This builder instance for method chaining
@@ -389,6 +420,7 @@ public interface McpServer {
 		 * Sets the server implementation information that will be shared with clients
 		 * during connection initialization. This helps with version compatibility,
 		 * debugging, and server identification.
+		 * 设置在连接初始化期间将与客户端共享的服务器实现信息。这有助于版本兼容性、调试和服务器识别。
 		 * @param serverInfo The server implementation details including name and version.
 		 * Must not be null.
 		 * @return This builder instance for method chaining
@@ -403,6 +435,8 @@ public interface McpServer {
 		/**
 		 * Sets the server implementation information using name and version strings. This
 		 * is a convenience method alternative to
+		 * 使用名称和版本字符串设置服务器实现信息。
+		 * 这是 serverInfo(McpSchema.Implementation) 的便捷替代方案。
 		 * {@link #serverInfo(McpSchema.Implementation)}.
 		 * @param name The server name. Must not be null or empty.
 		 * @param version The server version. Must not be null or empty.
@@ -421,6 +455,7 @@ public interface McpServer {
 		 * Sets the server instructions that will be shared with clients during connection
 		 * initialization. These instructions provide guidance to the client on how to
 		 * interact with this server.
+		 * 设置服务器在连接初始化期间与客户端共享的指令。这些指令指导客户端如何与服务器交互。
 		 * @param instructions The instructions text. Can be null or empty.
 		 * @return This builder instance for method chaining
 		 */
@@ -432,6 +467,7 @@ public interface McpServer {
 		/**
 		 * Sets whether to use strict tool name validation for this server. When set, this
 		 * takes priority over the system property
+		 * 设置是否对此服务器使用严格的工具名称验证。启用后，此设置优先于系统属性 io.modelcontextprotocol.strictToolNameValidation。
 		 * {@code io.modelcontextprotocol.strictToolNameValidation}.
 		 * @param strict true to throw exception on invalid names and false to warn only
 		 * @return This builder instance for method chaining
@@ -450,6 +486,13 @@ public interface McpServer {
 		 * <li>Resource access
 		 * <li>Prompt handling
 		 * </ul>
+		 * 设置服务器在连接初始化期间向客户端通告的功能。功能定义了服务器支持哪些特性，例如：
+		 *
+		 * 工具执行
+		 *
+		 * 资源访问
+		 *
+		 * 提示处理
 		 * @param serverCapabilities The server capabilities configuration. Must not be
 		 * null.
 		 * @return This builder instance for method chaining
@@ -465,12 +508,17 @@ public interface McpServer {
 		 * Adds a single tool with its implementation handler to the server. This is a
 		 * convenience method for registering individual tools without creating a
 		 * {@link McpServerFeatures.AsyncToolSpecification} explicitly.
+		 * 向服务器添加单个工具及其实现处理程序。
+		 * 这是一个便捷方法，用于注册单个工具，而无需显式创建 McpServerFeatures.AsyncToolSpecification。
 		 * @param tool The tool definition including name, description, and schema. Must
-		 * not be null.
+		 * not be null. 这个工具定义，包括名称、描述和架构。
 		 * @param callHandler The function that implements the tool's logic. Must not be
 		 * null. The function's first argument is an {@link McpAsyncServerExchange} upon
 		 * which the server can interact with the connected client. The second argument is
 		 * the {@link McpSchema.CallToolRequest} object containing the tool call
+		 * 实现工具逻辑的函数。该函数不能为空。函数的第一个参数是 McpAsyncServerExchange 对象，
+		 * 服务器可以通过该对象与已连接的客户端进行交互。
+		 * 第二个参数是包含工具调用的 McpSchema.CallToolRequest 对象。
 		 * @return This builder instance for method chaining
 		 * @throws IllegalArgumentException if tool or handler is null
 		 */
@@ -492,10 +540,11 @@ public interface McpServer {
 		 * Adds multiple tools with their handlers to the server using a List. This method
 		 * is useful when tools are dynamically generated or loaded from a configuration
 		 * source.
+		 * 使用列表将多个工具及其处理程序添加到服务器。当工具是动态生成或从配置源加载时，此方法非常有用。
 		 * @param toolSpecifications The list of tool specifications to add. Must not be
-		 * null.
-		 * @return This builder instance for method chaining
-		 * @throws IllegalArgumentException if toolSpecifications is null
+		 * null. 要添加的工具规格列表。不得为空。
+		 * @return This builder instance for method chaining 这是用于方法链的构建器实例
+		 * @throws IllegalArgumentException if toolSpecifications is null 如果 toolSpecifications 为空
 		 * @see #tools(McpServerFeatures.AsyncToolSpecification...)
 		 */
 		public AsyncSpecification<S> tools(List<McpServerFeatures.AsyncToolSpecification> toolSpecifications) {
@@ -513,6 +562,8 @@ public interface McpServer {
 		/**
 		 * Adds multiple tools with their handlers to the server using varargs. This
 		 * method provides a convenient way to register multiple tools inline.
+		 * 使用可变参数向服务器添加多个工具及其处理程序。此方法提供了一种便捷的方式来内联注册多个工具。
+		 *
 		 *
 		 * <p>
 		 * Example usage: <pre>{@code
@@ -551,6 +602,8 @@ public interface McpServer {
 		 * Registers multiple resources with their handlers using a Map. This method is
 		 * useful when resources are dynamically generated or loaded from a configuration
 		 * source.
+		 * 使用 Map 注册多个资源及其对应的处理程序。
+		 * 当资源是动态生成或从配置源加载时，此方法非常有用。
 		 * @param resourceSpecifications Map of resource name to specification. Must not
 		 * be null.
 		 * @return This builder instance for method chaining
@@ -567,6 +620,8 @@ public interface McpServer {
 		/**
 		 * Registers multiple resources with their handlers using a List. This method is
 		 * useful when resources need to be added in bulk from a collection.
+		 * 使用列表注册多个资源及其对应的处理程序。当需要从集合中批量添加资源时，此方法非常有用。
+		 *
 		 * @param resourceSpecifications List of resource specifications. Must not be
 		 * null.
 		 * @return This builder instance for method chaining
@@ -585,6 +640,7 @@ public interface McpServer {
 		/**
 		 * Registers multiple resources with their handlers using varargs. This method
 		 * provides a convenient way to register multiple resources inline.
+		 * 使用可变参数注册多个资源及其处理程序。此方法提供了一种便捷的内联注册多个资源的方式。
 		 *
 		 * <p>
 		 * Example usage: <pre>{@code
@@ -611,6 +667,7 @@ public interface McpServer {
 		 * Registers multiple resource templates with their specifications using a List.
 		 * This method is useful when resource templates need to be added in bulk from a
 		 * collection.
+		 * 使用列表注册多个资源模板及其规范。当需要从集合中批量添加资源模板时，此方法非常有用。
 		 * @param resourceTemplates Map of template URI to specification. Must not be
 		 * null.
 		 * @return This builder instance for method chaining
@@ -629,6 +686,8 @@ public interface McpServer {
 		 * Registers multiple resource templates with their specifications using a List.
 		 * This method is useful when resource templates need to be added in bulk from a
 		 * collection.
+		 * 使用列表注册多个资源模板及其规范。
+		 * 当需要从集合中批量添加资源模板时，此方法非常有用。
 		 * @param resourceTemplates List of template URI to specification. Must not be
 		 * null.
 		 * @return This builder instance for method chaining
@@ -648,6 +707,7 @@ public interface McpServer {
 		 * Registers multiple prompts with their handlers using a Map. This method is
 		 * useful when prompts are dynamically generated or loaded from a configuration
 		 * source.
+		 * 使用 Map 注册多个提示及其处理程序。当提示是动态生成或从配置源加载时，此方法非常有用。
 		 *
 		 * <p>
 		 * Example usage: <pre>{@code
@@ -670,6 +730,7 @@ public interface McpServer {
 		/**
 		 * Registers multiple prompts with their handlers using a List. This method is
 		 * useful when prompts need to be added in bulk from a collection.
+		 * 使用列表注册多个提示及其处理程序。当需要从集合中批量添加提示时，此方法非常有用。
 		 * @param prompts List of prompt specifications. Must not be null.
 		 * @return This builder instance for method chaining
 		 * @throws IllegalArgumentException if prompts is null
@@ -686,6 +747,7 @@ public interface McpServer {
 		/**
 		 * Registers multiple prompts with their handlers using varargs. This method
 		 * provides a convenient way to register multiple prompts inline.
+		 * 使用可变参数注册多个提示及其处理程序。此方法提供了一种便捷的方式来内联注册多个提示。
 		 *
 		 * <p>
 		 * Example usage: <pre>{@code
@@ -710,6 +772,7 @@ public interface McpServer {
 		/**
 		 * Registers multiple completions with their handlers using a List. This method is
 		 * useful when completions need to be added in bulk from a collection.
+		 * 使用列表注册多个代码补全及其处理程序。当需要从集合中批量添加代码补全时，此方法非常有用。
 		 * @param completions List of completion specifications. Must not be null.
 		 * @return This builder instance for method chaining
 		 * @throws IllegalArgumentException if completions is null
@@ -725,6 +788,7 @@ public interface McpServer {
 		/**
 		 * Registers multiple completions with their handlers using varargs. This method
 		 * is useful when completions are defined inline and added directly.
+		 * 使用可变参数注册多个补全及其处理程序。此方法适用于直接定义和添加内联补全的情况。
 		 * @param completions Array of completion specifications. Must not be null.
 		 * @return This builder instance for method chaining
 		 * @throws IllegalArgumentException if completions is null
@@ -758,6 +822,8 @@ public interface McpServer {
 		 * Registers multiple consumers that will be notified when the list of roots
 		 * changes. This method is useful when multiple consumers need to be registered at
 		 * once.
+		 * 注册多个消费者，当根目录列表发生变化时，这些消费者将收到通知。
+		 * 当需要同时注册多个消费者时，此方法非常有用。
 		 * @param handlers The list of handlers to register. Must not be null.
 		 * @return This builder instance for method chaining
 		 * @throws IllegalArgumentException if consumers is null
@@ -787,6 +853,7 @@ public interface McpServer {
 
 		/**
 		 * Sets the JsonMapper to use for serializing and deserializing JSON messages.
+		 * 设置用于序列化和反序列化 JSON 消息的 JsonMapper。
 		 * @param jsonMapper the mapper to use. Must not be null.
 		 * @return This builder instance for method chaining.
 		 * @throws IllegalArgumentException if jsonMapper is null
@@ -801,6 +868,7 @@ public interface McpServer {
 		 * Sets the JSON schema validator to use for validating tool and resource schemas.
 		 * This ensures that the server's tools and resources conform to the expected
 		 * schema definitions.
+		 * 设置用于验证工具和资源模式的 JSON 模式验证器。这确保服务器的工具和资源符合预期的模式定义。
 		 * @param jsonSchemaValidator The validator to use. Must not be null.
 		 * @return This builder instance for method chaining
 		 * @throws IllegalArgumentException if jsonSchemaValidator is null
@@ -824,6 +892,7 @@ public interface McpServer {
 
 		/**
 		 * Builds a synchronous MCP server that provides blocking operations.
+		 * 构建一个提供阻塞操作的同步 MCP 服务器。
 		 * @return A new instance of {@link McpSyncServer} configured with this builder's
 		 * settings.
 		 */

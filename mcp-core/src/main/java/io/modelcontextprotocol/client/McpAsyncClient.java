@@ -46,32 +46,47 @@ import reactor.core.publisher.Mono;
 /**
  * The Model Context Protocol (MCP) client implementation that provides asynchronous
  * communication with MCP servers using Project Reactor's Mono and Flux types.
+ * 模型上下文协议 (MCP) 客户端实现，使用 Project Reactor 的 Mono 和 Flux 类型与 MCP 服务器进行异步通信。
  *
  * <p>
  * This client implements the MCP specification, enabling AI models to interact with
  * external tools and resources through a standardized interface. Key features include:
+ * 该客户端实现了MCP规范，使AI模型能够通过标准化接口与外部工具和资源进行交互。主要功能包括：
  * <ul>
  * <li>Asynchronous communication using reactive programming patterns
+ *     使用响应式编程模式的异步通信
  * <li>Tool discovery and invocation for server-provided functionality
+ *     工具发现和调用，以实现服务器提供的功能
  * <li>Resource access and management with URI-based addressing
+ *     资源获取与管理，使用URI地址进行访问
  * <li>Prompt template handling for standardized AI interactions
+ *     针对标准化人工智能交互的提示模板处理
  * <li>Real-time notifications for tools, resources, and prompts changes
+ *     工具、资源和提示变更的实时通知
  * <li>Structured logging with configurable severity levels
+ *     具有可配置高级别的结构化日志记录
  * <li>Message sampling for AI model interactions
+ *     用于人工智能模型交互的消息采样
  * </ul>
  *
  * <p>
  * The client follows a lifecycle:
+ * 该客户端遵循生命周期：
  * <ol>
  * <li>Initialization - Establishes connection and negotiates capabilities
+ *     初始化 - 建立连接并协商功能
  * <li>Normal Operation - Handles requests and notifications
+ *     正常操作 - 处理请求和通知
  * <li>Graceful Shutdown - Ensures clean connection termination
+ *     优雅关机 - 确保连接正常终止
  * </ol>
  *
  * <p>
  * This implementation uses Project Reactor for non-blocking operations, making it
  * suitable for high-throughput scenarios and reactive applications. All operations return
  * Mono or Flux types that can be composed into reactive pipelines.
+ * 此实现使用 Project Reactor 进行非阻塞操作，因此适用于高吞吐量场景和响应式应用程序。
+ * 所有操作都返回 Mono 或 Flux 类型，这些类型可以组合成响应式管道。
  *
  * @author Dariusz Jędrzejczyk
  * @author Christian Tzolov
@@ -111,11 +126,13 @@ public class McpAsyncClient {
 
 	/**
 	 * Client capabilities.
+	 * 客户能力。
 	 */
 	private final McpSchema.ClientCapabilities clientCapabilities;
 
 	/**
 	 * Client implementation information.
+	 * 客户实施信息。
 	 */
 	private final McpSchema.Implementation clientInfo;
 
@@ -124,6 +141,8 @@ public class McpAsyncClient {
 	 * allowing them to understand which directories and files they have access to.
 	 * Servers can request the list of roots from supporting clients and receive
 	 * notifications when that list changes.
+	 * 根目录定义了服务器在文件系统中可以运行的边界，使服务器能够了解它们可以访问哪些目录和文件。
+	 * 服务器可以向支持的客户端请求根目录列表，并在该列表发生更改时接收通知。
 	 */
 	private final ConcurrentHashMap<String, Root> roots;
 
@@ -134,6 +153,9 @@ public class McpAsyncClient {
 	 * servers to leverage AI capabilities—with no server API keys necessary. Servers can
 	 * request text or image-based interactions and optionally include context from MCP
 	 * servers in their prompts.
+	 * MCP 为服务器提供了一种标准化的方式，使其能够通过客户端向语言模型请求 LLM 采样（“补全”或“生成”）。
+	 * 这种流程允许客户端保持对模型访问、选择和权限的控制，同时使服务器能够利用 AI 功能——无需服务器 API 密钥。
+	 * 服务器可以请求基于文本或图像的交互，并可选择在其提示中包含来自 MCP 服务器的上下文信息。
 	 */
 	private Function<CreateMessageRequest, Mono<CreateMessageResult>> samplingHandler;
 
@@ -143,42 +165,51 @@ public class McpAsyncClient {
 	 * control over user interactions and data sharing while enabling servers to gather
 	 * necessary information dynamically. Servers can request structured data from users
 	 * with optional JSON schemas to validate responses.
+	 * MCP 提供了一种标准化的方式，使服务器能够在交互过程中通过客户端向用户请求额外信息。
+	 * 这种流程允许客户端保持对用户交互和数据共享的控制，同时使服务器能够动态地收集必要信息。
+	 * 服务器可以向用户请求结构化数据，并可选择使用 JSON 模式来验证响应。
 	 */
 	private Function<ElicitRequest, Mono<ElicitResult>> elicitationHandler;
 
 	/**
 	 * Client transport implementation.
+	 * 客户端传输实现。
 	 */
 	private final McpClientTransport transport;
 
 	/**
 	 * The lifecycle initializer that manages the client-server connection initialization.
+	 * 管理客户端-服务器连接初始化的生命周期初始化器。
 	 */
 	private final LifecycleInitializer initializer;
 
 	/**
 	 * JSON schema validator to use for validating tool responses against output schemas.
+	 * 用于验证工具响应是否符合输出模式的 JSON 模式验证器。
 	 */
 	private final JsonSchemaValidator jsonSchemaValidator;
 
 	/**
 	 * Cached tool output schemas.
+	 * 缓存的工具输出模式。
 	 */
 	private final ConcurrentHashMap<String, Map<String, Object>> toolsOutputSchemaCache;
 
 	/**
 	 * Whether to enable automatic schema caching during callTool operations.
+	 * 是否在 callTool 操作期间启用自动模式缓存。
 	 */
 	private final boolean enableCallToolSchemaCaching;
 
 	/**
 	 * Create a new McpAsyncClient with the given transport and session request-response
 	 * timeout.
-	 * @param transport the transport to use.
-	 * @param requestTimeout the session request-response timeout.
-	 * @param initializationTimeout the max timeout to await for the client-server
-	 * @param jsonSchemaValidator the JSON schema validator to use for validating tool
-	 * @param features the MCP Client supported features. responses against output
+	 * 使用给定的传输方式和会话请求-响应超时时间创建一个新的 McpAsyncClient。
+	 * @param transport the transport to use.  使用的交通工具。
+	 * @param requestTimeout the session request-response timeout. 会话请求-响应超时。
+	 * @param initializationTimeout the max timeout to await for the client-server 等待客户端-服务器的最大超时时间
+	 * @param jsonSchemaValidator the JSON schema validator to use for validating tool 用于验证工具的 JSON 模式验证器
+	 * @param features the MCP Client supported features. responses against output MCP客户端支持的功能。针对输出的响应
 	 * schemas.
 	 */
 	McpAsyncClient(McpClientTransport transport, Duration requestTimeout, Duration initializationTimeout,
@@ -197,20 +228,24 @@ public class McpAsyncClient {
 		this.enableCallToolSchemaCaching = features.enableCallToolSchemaCaching();
 
 		// Request Handlers
+		// 请求处理程序
 		Map<String, RequestHandler<?>> requestHandlers = new HashMap<>();
 
 		// Ping MUST respond with an empty data, but not NULL response.
+		// Ping 必须返回空数据，但不能返回 NULL 响应。
 		requestHandlers.put(McpSchema.METHOD_PING, params -> {
 			logger.debug("Received ping: {}", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
 			return Mono.just(Map.of());
 		});
 
 		// Roots List Request Handler
+		// 根列表请求处理程序
 		if (this.clientCapabilities.roots() != null) {
 			requestHandlers.put(McpSchema.METHOD_ROOTS_LIST, rootsListRequestHandler());
 		}
 
 		// Sampling Handler
+		// 采样处理程序
 		if (this.clientCapabilities.sampling() != null) {
 			if (features.samplingHandler() == null) {
 				throw new IllegalArgumentException(
@@ -221,6 +256,7 @@ public class McpAsyncClient {
 		}
 
 		// Elicitation Handler
+		// 引出处理程序
 		if (this.clientCapabilities.elicitation() != null) {
 			if (features.elicitationHandler() == null) {
 				throw new IllegalArgumentException(
@@ -410,22 +446,30 @@ public class McpAsyncClient {
 	 * The initialization phase should be the first interaction between client and server.
 	 * The client will ensure it happens in case it has not been explicitly called and in
 	 * case of transport session invalidation.
+	 * 初始化阶段应该是客户端和服务器之间的首次交互。如果客户端没有显式调用初始化阶段，或者传输会话失效，客户端将确保初始化阶段的执行。
 	 * <p>
 	 * During this phase, the client and server:
+	 * 在此阶段，客户端和服务器：
 	 * <ul>
 	 * <li>Establish protocol version compatibility</li>
+	 *     建立协议版本兼容性
 	 * <li>Exchange and negotiate capabilities</li>
+	 *     交流和协商能力
 	 * <li>Share implementation details</li>
+	 *     分享实施细节
 	 * </ul>
 	 * <br/>
 	 * The client MUST initiate this phase by sending an initialize request containing:
 	 * The protocol version the client supports, client's capabilities and clients
 	 * implementation information.
+	 * 客户端必须通过发送包含以下内容的初始化请求来启动此阶段：客户端支持的协议版本、客户端的功能和客户端的实现信息。
 	 * <p>
 	 * The server MUST respond with its own capabilities and information.
+	 * 服务器必须提供自身的功能和信息进行响应。
 	 * </p>
 	 * After successful initialization, the client MUST send an initialized notification
 	 * to indicate it is ready to begin normal operations.
+	 * 初始化成功后，客户端必须发送初始化通知，表明它已准备好开始正常操作。
 	 * @return the initialize result.
 	 * @see <a href=
 	 * "https://github.com/modelcontextprotocol/specification/blob/main/docs/specification/basic/lifecycle.md#initialization">MCP
@@ -524,6 +568,8 @@ public class McpAsyncClient {
 	 * Manually sends a roots/list_changed notification. The addRoot and removeRoot
 	 * methods automatically send the roots/list_changed notification if the client is in
 	 * an initialized state.
+	 * 手动发送 roots/list_changed 通知。
+	 * 如果客户端处于初始化状态，addRoot 和 removeRoot 方法会自动发送 roots/list_changed 通知。
 	 * @return A Mono that completes when the notification is sent.
 	 */
 	public Mono<Void> rootsListChangedNotification() {
@@ -578,6 +624,7 @@ public class McpAsyncClient {
 	 * Calls a tool provided by the server. Tools enable servers to expose executable
 	 * functionality that can interact with external systems, perform computations, and
 	 * take actions in the real world.
+	 * 调用服务器提供的工具。工具使服务器能够公开可执行功能，这些功能可以与外部系统交互、执行计算并在现实世界中采取行动。
 	 * @param callToolRequest The request containing the tool name and input parameters.
 	 * @return A Mono that emits the result of the tool call, including the output and any
 	 * errors.
@@ -627,6 +674,7 @@ public class McpAsyncClient {
 
 	/**
 	 * Retrieves the list of all tools provided by the server.
+	 * 获取服务器提供的所有工具列表。
 	 * @return A Mono that emits the list of all tools result
 	 */
 	public Mono<McpSchema.ListToolsResult> listTools() {
@@ -641,8 +689,9 @@ public class McpAsyncClient {
 
 	/**
 	 * Retrieves a paginated list of tools provided by the server.
-	 * @param cursor Optional pagination cursor from a previous list request
-	 * @return A Mono that emits the list of tools result
+	 * 获取服务器提供的工具的分页列表。
+	 * @param cursor Optional pagination cursor from a previous list request 来自先前列表请求的可选分页光标
+	 * @return A Mono that emits the list of tools result 一个 Mono，它会输出工具列表结果。
 	 */
 	public Mono<McpSchema.ListToolsResult> listTools(String cursor) {
 		return this.initializer.withInitialization("listing tools", init -> this.listToolsInternal(init, cursor));
@@ -701,6 +750,7 @@ public class McpAsyncClient {
 	 * Retrieves the list of all resources provided by the server. Resources represent any
 	 * kind of UTF-8 encoded data that an MCP server makes available to clients, such as
 	 * database records, API responses, log files, and more.
+	 * 检索服务器提供的所有资源列表。资源是指 MCP 服务器向客户端提供的任何类型的 UTF-8 编码数据，例如数据库记录、API 响应、日志文件等。
 	 * @return A Mono that completes with the list of all resources result
 	 * @see McpSchema.ListResourcesResult
 	 * @see #readResource(McpSchema.Resource)
@@ -719,8 +769,13 @@ public class McpAsyncClient {
 	 * Retrieves a paginated list of resources provided by the server. Resources represent
 	 * any kind of UTF-8 encoded data that an MCP server makes available to clients, such
 	 * as database records, API responses, log files, and more.
+	 * 检索服务器提供的资源的分页列表。
+	 * 资源代表 MCP 服务器向客户端提供的任何类型的 UTF-8 编码数据，
+	 * 例如数据库记录、API 响应、日志文件等。
 	 * @param cursor Optional pagination cursor from a previous list request.
+	 *               来自先前列表请求的可选分页光标。
 	 * @return A Mono that completes with the list of resources result.
+	 *         一个返回资源列表结果的 Mono。
 	 * @see McpSchema.ListResourcesResult
 	 * @see #readResource(McpSchema.Resource)
 	 */
@@ -740,6 +795,7 @@ public class McpAsyncClient {
 	 * object. This method fetches the actual data that the resource represents.
 	 * @param resource The resource to read, containing the URI that identifies the
 	 * resource.
+	 * 读取由提供的 Resource 对象标识的特定资源的内容。此方法获取资源所表示的实际数据。
 	 * @return A Mono that completes with the resource content.
 	 * @see McpSchema.Resource
 	 * @see McpSchema.ReadResourceResult
@@ -751,8 +807,11 @@ public class McpAsyncClient {
 	/**
 	 * Reads the content of a specific resource identified by the provided request. This
 	 * method fetches the actual data that the resource represents.
+	 * 读取请求中指定的资源的内容。此方法会获取资源所代表的实际数据。
 	 * @param readResourceRequest The request containing the URI of the resource to read
+	 *                            包含要读取的资源 URI 的请求
 	 * @return A Mono that completes with the resource content.
+	 *         一个与资源内容相匹配的 Mono。
 	 * @see McpSchema.ReadResourceRequest
 	 * @see McpSchema.ReadResourceResult
 	 */
@@ -770,7 +829,10 @@ public class McpAsyncClient {
 	 * Retrieves the list of all resource templates provided by the server. Resource
 	 * templates allow servers to expose parameterized resources using URI templates,
 	 * enabling dynamic resource access based on variable parameters.
+	 * 获取服务器提供的所有资源模板列表。
+	 * 资源模板允许服务器使用 URI 模板公开参数化资源，从而实现基于可变参数的动态资源访问。
 	 * @return A Mono that completes with the list of all resource templates result
+	 *         一个 Mono，其中包含所有资源模板的列表结果
 	 * @see McpSchema.ListResourceTemplatesResult
 	 */
 	public Mono<McpSchema.ListResourceTemplatesResult> listResourceTemplates() {
@@ -790,8 +852,12 @@ public class McpAsyncClient {
 	 * Retrieves a paginated list of resource templates provided by the server. Resource
 	 * templates allow servers to expose parameterized resources using URI templates,
 	 * enabling dynamic resource access based on variable parameters.
+	 * 获取服务器提供的资源模板分页列表。
+	 * 资源模板允许服务器使用 URI 模板公开参数化资源，从而实现基于可变参数的动态资源访问。
 	 * @param cursor Optional pagination cursor from a previous list request.
+	 *               来自先前列表请求的可选分页光标。
 	 * @return A Mono that completes with the list of resource templates result.
+	 *         一个 Mono，其结果为资源模板列表。
 	 * @see McpSchema.ListResourceTemplatesResult
 	 */
 	public Mono<McpSchema.ListResourceTemplatesResult> listResourceTemplates(String cursor) {
@@ -809,6 +875,7 @@ public class McpAsyncClient {
 	 * Subscribes to changes in a specific resource. When the resource changes on the
 	 * server, the client will receive notifications through the resources change
 	 * notification handler.
+	 * 订阅特定资源的变更。当服务器上的资源发生变更时，客户端将通过资源变更通知处理程序收到通知。
 	 * @param subscribeRequest The subscribe request containing the URI of the resource.
 	 * @return A Mono that completes when the subscription is complete.
 	 * @see McpSchema.SubscribeRequest
@@ -822,6 +889,7 @@ public class McpAsyncClient {
 	/**
 	 * Cancels an existing subscription to a resource. After unsubscribing, the client
 	 * will no longer receive notifications when the resource changes.
+	 * 取消对某个资源的现有订阅。取消订阅后，客户端将不再收到该资源变更的通知。
 	 * @param unsubscribeRequest The unsubscribe request containing the URI of the
 	 * resource.
 	 * @return A Mono that completes when the unsubscription is complete.
@@ -873,7 +941,9 @@ public class McpAsyncClient {
 
 	/**
 	 * Retrieves the list of all prompts provided by the server.
+	 * 获取服务器提供的所有提示列表。
 	 * @return A Mono that completes with the list of all prompts result.
+	 *         一个 Mono，完成时会列出所有提示结果。
 	 * @see McpSchema.ListPromptsResult
 	 * @see #getPrompt(GetPromptRequest)
 	 */
@@ -889,6 +959,7 @@ public class McpAsyncClient {
 
 	/**
 	 * Retrieves a paginated list of prompts provided by the server.
+	 * 获取服务器提供的分页提示列表。
 	 * @param cursor Optional pagination cursor from a previous list request
 	 * @return A Mono that completes with the list of prompts result.
 	 * @see McpSchema.ListPromptsResult
@@ -902,6 +973,7 @@ public class McpAsyncClient {
 	/**
 	 * Retrieves a specific prompt by its ID. This provides the complete prompt template
 	 * including all parameters and instructions for generating AI content.
+	 * 通过 ID 获取特定提示。这将提供完整的提示模板，包括生成 AI 内容所需的所有参数和指令。
 	 * @param getPromptRequest The request containing the ID of the prompt to retrieve.
 	 * @return A Mono that completes with the prompt result.
 	 * @see McpSchema.GetPromptRequest
@@ -943,6 +1015,7 @@ public class McpAsyncClient {
 	/**
 	 * Sets the minimum logging level for messages received from the server. The client
 	 * will only receive log messages at or above the specified severity level.
+	 * 设置从服务器接收消息的最低日志级别。客户端只会收到级别等于或高于指定级别的日志消息。
 	 * @param loggingLevel The minimum logging level to receive.
 	 * @return A Mono that completes when the logging level is set.
 	 * @see McpSchema.LoggingLevel
@@ -977,6 +1050,7 @@ public class McpAsyncClient {
 	/**
 	 * This method is package-private and used for test only. Should not be called by user
 	 * code.
+	 * 此方法是包私有的，仅用于测试。用户代码不应调用此方法。
 	 * @param protocolVersions the Client supported protocol versions.
 	 */
 	void setProtocolVersions(List<String> protocolVersions) {
@@ -993,6 +1067,7 @@ public class McpAsyncClient {
 	 * Sends a completion/complete request to generate value suggestions based on a given
 	 * reference and argument. This is typically used to provide auto-completion options
 	 * for user input fields.
+	 * 发送完成/补全请求，根据给定的引用和参数生成值建议。这通常用于为用户输入字段提供自动补全选项。
 	 * @param completeRequest The request containing the prompt or resource reference and
 	 * argument for which to generate completions.
 	 * @return A Mono that completes with the result containing completion suggestions.

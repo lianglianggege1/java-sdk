@@ -50,59 +50,89 @@ public final class McpSchema {
 	// ---------------------------
 
 	// Lifecycle Methods
+	// 生命周期管理方法
+	// 初始化
 	public static final String METHOD_INITIALIZE = "initialize";
 
+	// 通知/已初始化
 	public static final String METHOD_NOTIFICATION_INITIALIZED = "notifications/initialized";
 
+	// 探知
 	public static final String METHOD_PING = "ping";
 
+	// 通知处理中
 	public static final String METHOD_NOTIFICATION_PROGRESS = "notifications/progress";
 
 	// Tool Methods
+	// 工具相关方法
+	// 工具列表
 	public static final String METHOD_TOOLS_LIST = "tools/list";
 
+	// 工具调用
 	public static final String METHOD_TOOLS_CALL = "tools/call";
 
+	// 通知/工具/列表已更改
 	public static final String METHOD_NOTIFICATION_TOOLS_LIST_CHANGED = "notifications/tools/list_changed";
 
 	// Resources Methods
+	// 资源相关方法
+	// 资源列表
 	public static final String METHOD_RESOURCES_LIST = "resources/list";
 
+	// 读取资源
 	public static final String METHOD_RESOURCES_READ = "resources/read";
 
+	// 通知/资源/列表已更改
 	public static final String METHOD_NOTIFICATION_RESOURCES_LIST_CHANGED = "notifications/resources/list_changed";
 
+	// 通知/资源/已更新
 	public static final String METHOD_NOTIFICATION_RESOURCES_UPDATED = "notifications/resources/updated";
 
+	// 资源/模版/列表
 	public static final String METHOD_RESOURCES_TEMPLATES_LIST = "resources/templates/list";
 
+	// 资源/订阅
 	public static final String METHOD_RESOURCES_SUBSCRIBE = "resources/subscribe";
 
+	// 资源/取消订阅
 	public static final String METHOD_RESOURCES_UNSUBSCRIBE = "resources/unsubscribe";
 
 	// Prompt Methods
+	// 提示方法
+	// 提示列表
 	public static final String METHOD_PROMPT_LIST = "prompts/list";
 
+	// 获取提示
 	public static final String METHOD_PROMPT_GET = "prompts/get";
 
+	// 提示/列表已更改
 	public static final String METHOD_NOTIFICATION_PROMPTS_LIST_CHANGED = "notifications/prompts/list_changed";
 
+	// 完成/完成
 	public static final String METHOD_COMPLETION_COMPLETE = "completion/complete";
 
 	// Logging Methods
+	// 日志相关方法
+	// 日志/级别设置
 	public static final String METHOD_LOGGING_SET_LEVEL = "logging/setLevel";
 
+	// 通知/消息
 	public static final String METHOD_NOTIFICATION_MESSAGE = "notifications/message";
 
 	// Roots Methods
+	// 根列表
 	public static final String METHOD_ROOTS_LIST = "roots/list";
 
+	// 通知/根已更改列表
 	public static final String METHOD_NOTIFICATION_ROOTS_LIST_CHANGED = "notifications/roots/list_changed";
 
 	// Sampling Methods
+	// 采样方法
+	// 创建消息
 	public static final String METHOD_SAMPLING_CREATE_MESSAGE = "sampling/createMessage";
 
 	// Elicitation Methods
+	// 获取/创建消息
 	public static final String METHOD_ELICITATION_CREATE = "elicitation/create";
 
 	// ---------------------------
